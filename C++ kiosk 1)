@@ -1,0 +1,197 @@
+#include<iostream>//C++ 표준 입출력 라이브러리
+#include<string>// 문자열 라이브러리
+#include<vector>//벡터 라이브러리
+#include<algorithm>//알고리즘 관련 라이브러리
+using namespace std;
+
+class menulist {
+private:
+	string name;
+	int price;
+	string others;
+
+public:
+	menulist(const string& n, const int p, const string& other) {//생성자
+		name = n;
+		price = p;
+		others = other;
+	}
+	string getName() const { return name; }
+	int getPrice() const { return price; }
+	string getOthers() const { return others; }
+	void setName(const string& n) { name = n; }
+	void setPrice(const int p) { price = p; }
+	void setOthers(const string& other) { others = other; }
+};
+
+class menuManager {
+private:
+	vector<menulist> menumanager;
+public:
+	void getmenu(const int index) {
+		cout << menumanager[index].getName() << "\n";
+		cout << menumanager[index].getPrice() << "\n";
+		cout << menumanager[index].getOthers() << "\n";
+	}
+	void sortname(int num) {
+		if (num == 2) {
+			sort(menumanager.begin(), menumanager.end(), [](const menulist& a, const menulist& b) {
+				return a.getName() < b.getName();
+				});
+		}
+		else {
+			sort(menumanager.begin(), menumanager.end(), [](const menulist& a,const menulist& b) {
+				return a.getPrice() < b.getPrice();
+				});
+		}
+		for (int i = 0; i < menumanager.size(); i++) {
+			getmenu(i);
+			cout << "\n";
+		}
+		system("pause");
+	}
+	void pushMenu() {
+		string name;
+		int price;
+		string others;
+		cout << "input menu name >> ";
+		cin.ignore();
+		getline(cin, name);
+		cout << "input menu price >> ";
+		cin >> price;
+		cout << "input menu other matters >> ";
+		cin.ignore();
+		getline(cin, others);
+		menumanager.push_back(menulist(name, price, others));
+	}
+	int findMenu() {
+		int num;
+		string name;
+		while (1) {
+			cout << "input find menu name >> ";
+			getline(cin, name);
+			for (int i = 0; i < menumanager.size(); i++) {
+				if (menumanager[i].getName() == name) { return i; };
+			}
+			int breaknum;
+			cout << "no menu to find...\nif you input number 2, you can break\n>>(2) >>";
+			cin >> breaknum;
+			if (breaknum == 2) { return -1; }
+		}
+	}
+	void setMenu() {
+		int index,num;
+		index = findMenu();
+		while (1) {
+			system("cls");
+			if (index == -1) { break; }
+			cout << "input set menu part\n1. name >> (1)\n2. price >> (2)\n3. other matters >> (3)\n4. break >> (4)\n>>>> ";
+			cin >> num;
+			if (num == 1) {
+				string newname;
+				cout << "input new menu name >> ";
+				cin.ignore();
+				getline(cin, newname);
+				menumanager[index].setName(newname);
+				cout << "complete set name\n";
+				system("pause");
+			}
+			else if (num == 2) {
+				int newprice;
+				cout << "input new menu price";
+				cin >> newprice;
+				menumanager[index].setPrice(newprice);
+				cout << "complete set price\n";
+				system("pause");
+			}
+			else if (num == 3) {
+				string newothers;
+				cout << "input new menu other matters";
+				cin.ignore();
+				getline(cin, newothers);
+				menumanager[index].setOthers(newothers);
+				cout << "complete set other matters\n";
+				system("pause");
+			}
+			else if (num == 4) { break; }
+			else {
+				cout << "no menu part to find...\n";
+				system("pause");
+			}
+		}
+	}
+};
+
+class UI {
+private:
+	const string ID = "abc";
+	const string password = "abcabc";
+	const string secretCommand = "hello world";
+	menuManager manager;
+public:
+
+	void manageruser() {
+		string id, ps,num;
+		system("cls");
+		cout << "input id >> ";
+		getline(cin, id);
+		cout << "input password >> ";
+		getline(cin, ps);
+		while (1) {
+			if (id != ID || ps != password) {
+				break;
+			}
+			system("cls");
+			cout << "1.push menu >> (1)\n2.set menu >> (2)\n3. break >> (3)\n>>>>";
+			cin >> num;
+			if (num == "1") {
+				manager.pushMenu();
+			}
+			else if (num == "2") {
+				manager.setMenu();
+			}
+			else if (num == "3") {
+				break;
+			}
+		}
+	}
+	
+	void start() {
+		string num;
+		while (1) {
+			system("cls");
+			cout << "1. find menu >> (1)\n2. sort name >> (2)\n3. sort price >> (3)\n>>>>> ";
+			getline(cin, num);
+			if (num == "1") {
+				int index = manager.findMenu();
+				if (index == -1) {
+					cout << "no menu name to find...\n";
+					system("pause");
+				}
+				else {
+					manager.getmenu(index);
+					system("pause");
+				}
+			}
+			else if (num == "2" || num == "3") {
+				int intnum=num[0];
+				intnum -= '0';
+				manager.sortname(intnum);
+			}
+			else if (num == secretCommand) {
+				manageruser();
+			}
+			else {
+				cout << "no part to find...\n";
+				system("pause");
+			}
+		}
+	}
+};
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	UI ui;
+	ui.start();
+}

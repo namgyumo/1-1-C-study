@@ -1,0 +1,448 @@
+#include<iostream>//C++ 표준 입출력 라이브러리
+#include<string>// 문자열 라이브러리
+#include<vector>//벡터 라이브러리
+#include<algorithm>//알고리즘 관련 라이브러리
+using namespace std;
+
+class menulist {
+private:
+   string name;
+   int price;
+   string others;
+   int numbering;
+
+public:
+   menulist(const string& n, const int p, const string& other, const int nb) {//생성자
+      name = n;
+      price = p;
+      others = other;
+      numbering = nb;
+   }
+   string getName() const { return name; }
+   int getPrice() const { return price; }
+   string getOthers() const { return others; }
+   int getNumbering() const { return numbering; }
+   void setName(const string& n) { name = n; }
+   void setPrice(const int p) { price = p; }
+   void setOthers(const string& other) { others = other; }
+   void setNumbering(const int nb) { numbering = nb; }
+};
+
+class cinmanager {
+public:
+   int intcin(const string& input) {
+      int returnint = 0;
+      for (char ch : input) {
+         if (ch<'0' || ch>'9') return 0;
+         returnint = returnint * 10 + (ch - '0');
+      }
+      return returnint;
+   }
+};
+
+
+
+
+class menuManager {
+protected:
+   vector<menulist> menumanager;
+public:
+   int getsize() {
+      return menumanager.size();
+   }
+   string getname(const int index) {
+      return menumanager[index].getName();
+   }
+   int getprice(const int index) {
+      return menumanager[index].getPrice();
+   }
+   string getothers(const int index) {
+      return menumanager[index].getOthers();
+   }
+   int getnumbering(const int index) {
+      return menumanager[index].getNumbering();
+   }
+   void setname(const int index, string& newname) {
+      menumanager[index].setName(newname);
+   }
+   void setprice(const int index, int newprice) {
+      menumanager[index].setPrice(newprice);
+   }
+   void setother(const int index, string& newother) {
+      menumanager[index].setOthers(newother);
+   }
+   void setnumbering(const int index, const int numbering) {
+      menumanager[index].setNumbering(numbering);
+   }
+   void pushmenu(const string& name, const int price, const string& other,const int numbering) {
+      menumanager.push_back(menulist(name, price, other,numbering));
+   }
+   void deletemenu(const int index) {
+      menumanager.erase(menumanager.begin() + index);
+   }
+   void getmenu(const int index) {
+      cout << "name : " << menumanager[index].getName() << "\n";
+      cout << "price : " << menumanager[index].getPrice() << "\n";
+      cout << "other matters : " << menumanager[index].getOthers() << "\n";
+      cout << "numbering : number " << menumanager[index].getNumbering() << "\n";
+   }
+   void sortname(int num, bool typesort) {
+      if (num == 2) {
+         sort(menumanager.begin(), menumanager.end(), [](const menulist& a, const menulist& b) {
+            return a.getName() < b.getName();
+            });
+      }
+      else if (num == 3) {
+         sort(menumanager.begin(), menumanager.end(), [](const menulist& a, const menulist& b) {
+            return a.getPrice() < b.getPrice();
+            });
+      }
+      else if (num == 4) {
+         sort(menumanager.begin(), menumanager.end(), [](const menulist& a, const menulist& b) {
+            return a.getNumbering() < b.getNumbering();
+            });
+      }
+      for (int i = 0; i < menumanager.size(); i++) {
+         if (typesort == 1) {
+            break;
+         }
+         getmenu(i);
+         cout << "\n";
+      }
+      system("pause");
+   }
+
+
+};
+
+class SetAndFind {
+private:
+   menuManager& manager;
+   cinmanager cmanager;
+public:
+   SetAndFind(menuManager& m) : manager(m){}
+   int findMenu() {
+      int num;
+      string name,input;
+      while (1) {
+         system("cls");
+         cout << "input menu part to find menu\n1.menu name >> (1)\n2.menu numbering >> (2)\n>>>>";
+         getline(cin, input);
+         num = cmanager.intcin(input);
+         if (num == 1) {
+            cout << "input find menu name >> ";
+            getline(cin, name);
+            for (int i = 0; i < manager.getsize(); i++) {
+               if (manager.getname(i) == name) { return i; };
+            }
+            string inputbreak;
+            int breaknum;
+            cout << "no menu to find...\nif you input number 2, you can break\n>>(2) >>";
+            getline(cin, inputbreak);
+            breaknum = cmanager.intcin(inputbreak);
+            if (breaknum == 2) { return -1; }
+         }
+         else if (num == 2) {
+            string inputnum;
+            int numbering;
+            cout << "input find menu numbering >> ";
+            getline(cin, inputnum);
+            numbering = cmanager.intcin(inputnum);
+            for (int i = 0; i < manager.getsize(); i++) {
+               if (manager.getnumbering(i) == numbering) { return i; }
+            }
+            string inputbreak;
+            int breaknum;
+            cout << "no menu to find...\nif you input number 2, you can break\n>>(2) >>";
+            getline(cin, inputbreak);
+            breaknum = cmanager.intcin(inputbreak);
+            if (breaknum == 2) { return -1; }
+
+         }
+      }
+   }
+
+   void setMenu() {
+      int index, num;
+      string inputnum;
+      index = findMenu();
+      while (1) {
+         system("cls");
+         if (index == -1) { break; }
+         cout << "input set menu part\n1. name >> (1)\n2. price >> (2)\n3. other matters >> (3)\n4. break >> (4)\n>>>> ";
+         getline(cin, inputnum);
+         num = cmanager.intcin(inputnum);
+         if (num == 1) {
+            string newname;
+            cout << "input new menu name >> ";
+            getline(cin, newname);
+            manager.setname(index,newname);
+            cout << "complete set name\n";
+            system("pause");
+         }
+         else if (num == 2) {
+            int newprice;
+            string inputprice;
+            cout << "input new menu price";
+            getline(cin, inputprice);
+            newprice = cmanager.intcin(inputprice);
+            manager.setprice(index,newprice);
+            cout << "complete set price\n";
+            system("pause");
+         }
+         else if (num == 3) {
+            string newothers;
+            cout << "input new menu other matters";
+            getline(cin, newothers);
+            manager.setother(index,newothers);
+            cout << "complete set other matters\n";
+            system("pause");
+         }
+         else if (num == 4) { break; }
+         else {
+            cout << "no menu part to find...\n";
+            system("pause");
+         }
+      }
+   }
+};
+
+class PushAndDelete {
+private:
+   menuManager& manager;
+   SetAndFind setmanager;
+   cinmanager cmanager;
+public:
+   PushAndDelete(menuManager& m) : manager(m), setmanager(m) {}
+   void pushMenu() {
+      string name;
+      int price;
+      string inputprice;
+      string others;
+      int numbering = manager.getsize() + 1;
+      bool breaknum = 0;
+      while (1) {
+         system("cls");
+         bool samename = 0;
+         breaknum = 0;
+         cout << "input menu name >> ";
+         getline(cin, name);
+         for (int i = 0; i < manager.getsize(); i++) {
+            if (manager.getname(i) == name) {
+               samename = 1;
+               break;
+            }
+         }
+         if (samename == 1) {
+            int num;
+            string inputnum;
+            while (1) {
+               cout << "same name...\n1.input new name? >> (1)\n2.break >> (2)\n>>>>";
+               getline(cin, inputnum);
+               num = cmanager.intcin(inputnum);
+               if (num == 1) {
+                  break;
+               }
+               else if (num == 2) {
+                  breaknum = 1;
+                  break;
+               }
+               else {
+                  cout << "no command to find...\n";
+                  system("pause");
+               }
+            }
+            if (breaknum == 1) {
+               break;
+            }
+         }
+         else {
+            break;
+         }
+      }
+      if (breaknum != 1) {
+         cout << "input menu price >> ";
+         getline(cin, inputprice);
+         price = cmanager.intcin(inputprice);
+         cout << "input menu other matters >> ";
+         getline(cin, others);
+         manager.pushmenu(name,price,others,numbering);
+      }
+   }
+
+   void deleteMenu() {
+      manager.sortname(4, 1);
+      int index = setmanager.findMenu();
+      int num;
+      string inputnum;
+      while (1) {
+         if (index == -1) { break; }
+         system("cls");
+         cout << "delete " << manager.getname(index) << " menu?\n1. YES >> (1)\n2. NO >> (2)\n>>>>";
+         getline(cin, inputnum);
+         num = cmanager.intcin(inputnum);
+         if (num == 1) {
+            manager.deletemenu(index);
+            for (int i = index; i < manager.getsize(); i++) {
+               manager.setnumbering(i,i + 1);
+            }
+            manager.sortname(4, 1);
+            cout << "success delete menu\n";
+            system("pause");
+            break;
+         }
+         else if (num == 2) {
+            cout << "not delete menu\n";
+            system("pause");
+            break;
+         }
+         cout << "no command to find...\n";
+         system("pause");
+      }
+   }
+
+
+};
+
+
+class Buy {
+private:
+   menuManager& manager;
+   int handmoney = 50000;
+   cinmanager cmanager;
+public:
+   Buy(menuManager& m) : manager(m) {}
+   void buymenu(const int index) {
+      int price = manager.getprice(index);
+      while (1) {
+         system("cls");
+         cout << "hand money : " << handmoney << "\n";
+         if (price > handmoney) {
+            cout << "not enough money to buy " << manager.getname(index) << "\n";
+            system("pause");
+            break;
+         }
+         string input;
+         cout << "buy " << manager.getname(index) << "?\nspend money : " << price
+            << "\nreturn money : " << handmoney - price << "\n1.YES >> (1)\n2.NO >> (2)\n>>>>";
+         getline(cin, input);
+         int num = cmanager.intcin(input);
+         if (num == 1) {
+            handmoney -= price;
+            cout << "complete buy " << manager.getname(index) << " menu...\n";
+            system("pause");
+         }
+         else if (num != 2) {
+            cout << "no command to find...\n";
+            system("pause");
+         }
+         break;
+      }
+   }
+   void setmoney(const int newmoney) {
+      handmoney = newmoney;
+   }
+   int getmoney() { return handmoney; }
+};
+
+class UI {
+private:
+   const string ID = "abc";
+   const string password = "abcabc";
+   const string secretCommand = "hello world";
+   menuManager manager;
+   PushAndDelete iomanager;
+   SetAndFind setmanager;
+   Buy buy;
+   cinmanager cmanager;
+public:
+   UI() : manager(), buy(manager), iomanager(manager), setmanager(manager) {}
+   void manageruser() {
+      int num;
+      string id, ps,input;
+      system("cls");
+      cout << "input id >> ";
+      getline(cin, id);
+      cout << "input password >> ";
+      getline(cin, ps);
+      while (1) {
+         system("cls");
+         if (id != ID || ps != password) {
+            break;
+         }
+         system("cls");
+         cout << "1.push menu >> (1)\n2.set menu >> (2)\n3.delete menu >> (3)\n4.set money >> (4)\n5.break >> (5)\n>>>>";
+         getline(cin, input);
+         num = cmanager.intcin(input);
+         if (num == 1) {
+            iomanager.pushMenu();
+         }
+         else if (num == 2) {
+            setmanager.setMenu();
+         }
+         else if (num == 3) {
+            iomanager.deleteMenu();
+         }
+         else if (num == 4) {
+            string moneyinput;
+            int newmoney;
+            cout << "input new money >> ";
+            getline(cin, moneyinput);
+            newmoney = cmanager.intcin(moneyinput);
+            buy.setmoney(newmoney);
+            cout << "hand money : " << buy.getmoney() << "\n";
+            system("pause");
+         }
+         else if (num == 5) {
+            break;
+         }
+         else {
+            cout << "no command to find...\n";
+            system("pause");
+         }
+      }
+   }
+
+   void start() {
+      string num;
+      while (1) {
+         system("cls");
+         cout << buy.getmoney() << "\n\n";
+         cout << "1. find menu >> (1)\n2. sort name >> (2)\n3. sort price >> (3)\n4. sort numbering >> (4)\n5. buy menu >> (5)\n>>>>> ";
+         getline(cin, num);
+         if (num == "1") {
+            int index = setmanager.findMenu();
+            if (index != -1) {
+               manager.getmenu(index);
+               system("pause");
+            }
+         }
+         else if (num == "2" || num == "3" || num == "4") {
+            int intnum = cmanager.intcin(num);
+            manager.sortname(intnum, 0);
+         }
+         else if (num == "5") {
+            int index = setmanager.findMenu();
+            if (index != -1) {
+               buy.buymenu(index);
+            }
+         }
+         else if (num == secretCommand) {
+            manageruser();
+         }
+         else {
+            cout << "no part to find...\n";
+            system("pause");
+         }
+      }
+   }
+};
+
+int main(void) {
+   ios::sync_with_stdio(false);
+   cin.tie(nullptr);
+   UI ui;
+   ui.start();
+
+   return 0;
+}

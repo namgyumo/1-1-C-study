@@ -1,0 +1,1162 @@
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+#include<memory>
+using namespace std;
+
+class living {
+protected:
+    static int global_id;
+    int numbering;
+    int typenum;
+    int type;
+    string name;
+    int age;
+    int damage;
+    int hp;
+    int defence;
+    int level = 1;
+    float EX = 1;
+    bool live = true;
+public:
+    living(const string& n, const int a, const int da, const int h, const int df, const int tn, const int tp)
+        : name(n), age(a), numbering(global_id++), damage(da), hp(h), defence(df), typenum(tn), type(tp), level(), EX(), live() {
+    }
+
+    virtual string getname() const { return name; }
+    virtual int getage() const { return age; }
+    virtual int getdamage() const { return damage; }
+    virtual int gethp() const { return hp; }
+    virtual int getdefence() const { return defence; }
+    virtual int getnumbering() const { return numbering; }
+    virtual int getlevel() const { return level; }
+    virtual float getEX() const { return EX; }
+    virtual bool getlive() const { return live; }
+    virtual int gettype() const { return type; }
+    virtual int gettypenum() const { return typenum; }
+
+    virtual void setname(const string& newname) { name = newname; }
+    virtual void setage(const int newage) { age = newage; }
+    virtual void setdamage(const int newdamage) { damage = newdamage; }
+    virtual void sethp(const int newhp) { hp = newhp; }
+    virtual void setdefence(const int newdefence) { defence = newdefence; }
+    virtual void setnumbering(const int num) { numbering = num; }
+    virtual void setlevel(const int newlevel) { level = newlevel; }
+    virtual void setEX(const float newEX) { EX = newEX; }
+    virtual void setlive(const bool newlive) { live = newlive; }
+    virtual string getType() const = 0;
+    virtual ~living() = default;
+};
+int living::global_id = 1;
+
+class user : public living {
+private:
+    const int usertype = 1;
+    static int usernumSet;
+public:
+    user(const string& n, const int a) :
+        living(n, a, 6, 18, 0, usernumSet++, usertype) {
+    }
+    void setusernum(const int usern) { typenum = usern; }
+    int getUnumbering() const { return typenum; }
+    string getType() const override { return "user"; }
+};
+int user::usernumSet = 1;
+
+class monster : public living {
+private:
+    static int monsternumSet;
+    const int monstertype = 2;
+public:
+    monster(const string& n, const int a, const int da, const int h, const int df) :
+        living(n, a, da, h, df, monsternumSet++, monstertype) {
+    }
+    void setmonsternum(const int mnum) { typenum = mnum; }
+    int getMnumbering() const { return typenum; }
+    string getType() const override { return"monster"; }
+};
+int monster::monsternumSet = 1;
+
+class livingmanager {
+private:
+    vector<shared_ptr<living>> manager;
+public:
+    void push(const shared_ptr<living>& entity) {
+        manager.push_back(entity);
+    }
+    size_t getsize() {
+        return manager.size();
+    }
+    int Rnumbering() {
+        return getsize() + 1;
+    }
+
+    void deleteliving(const int index) {
+        manager.erase(manager.begin() + index);
+    }
+
+    string getname(const int index) { return manager[index]->getname(); }
+    int getage(const int index) { return manager[index]->getage(); }
+    int getdamage(const int index) { return manager[index]->getdamage(); }
+    int gethp(const int index) { return manager[index]->gethp(); }
+    int getdefence(const int index) { return manager[index]->getdefence(); }
+    int getnumbering(const int index) { return manager[index]->getnumbering(); }
+    int getlevel(const int index) { return manager[index]->getlevel(); }
+    float getEX(const int index) { return manager[index]->getEX(); }
+    bool getlive(const int index) { return manager[index]->getlive(); }
+    int  gettype(const int index) { return manager[index]->gettype(); }
+    int gettypenum(const int index) { return manager[index]->gettypenum(); }
+    void printall(const int index) {
+        cout << "\nname : " << getname(index)
+            << "\nage : " << getage(index)
+            << "\ndamage : " << getdamage(index) << "   hp : " << gethp(index) << "   defence : " << getdefence(index)
+            << "\nlevel : " << getlevel(index) << "   EX : " << getEX(index) << "   Type : " << gettype(index)
+            << "\nnumbering : " << getnumbering(index) << "   type numbering : " << gettypenum(index) << "\n\n";
+    }
+
+    void setUnum(const int index, const int newnum) { manager[index]->setnumbering(newnum); }
+
+    void sortnum() {
+        sort(manager.begin(), manager.end(), [](const auto& a, const auto& b) {
+            return a->getnumbering() < b->getnumbering();
+            });
+    }
+    void sortname() {
+        sort(manager.begin(), manager.end(), [](const auto& a, const auto& b) {
+            return a->getname() < b->getname();
+            });
+    }
+    void sortage() {
+        sort(manager.begin(), manager.end(), [](const auto& a, const auto& b) {
+            return a->getage() < b->getage();
+            });
+    }
+    void sortdamage() {
+        sort(manager.begin(), manager.end(), [](const auto& a, const auto& b) {
+            return a->getdamage() < b->getdamage();
+            });
+    }
+    void sorthp() {
+        sort(manager.begin(), manager.end(), [](const auto& a, const auto& b) {
+            return a->gethp() < b->gethp();
+            });
+    }
+    void sortdefence() {
+        sort(manager.begin(), manager.end(), [](const auto& a, const auto& b) {
+            return a->getdefence() < b->getdefence();
+            });
+    }
+    void sortlevel() {
+        sort(manager.begin(), manager.end(), [](const auto& a, const auto& b) {
+            return a->getlevel() > b->getlevel();
+            });
+    }
+};
+
+class usermanager {
+private:
+    livingmanager& manager;
+    vector<shared_ptr<user>> umanager;
+public:
+    usermanager(livingmanager& m) : manager(m) {}
+
+    int RUnumbering() {
+        return umanager.size() + 1;
+    }
+
+    void pushuser(const string& name, const int age) {
+        shared_ptr<user> newUser = make_shared<user>(name, age);
+        manager.push(newUser);
+        umanager.push_back(newUser);
+    }
+
+    void deleteuser(const int index, const int mainindex) {
+        umanager.erase(umanager.begin() + index);
+        manager.deleteliving(mainindex);
+    }
+
+    string getname(const int index) { return umanager[index]->getname(); }
+    int getage(const int index) { return umanager[index]->getage(); }
+    int getdamage(const int index) { return umanager[index]->getdamage(); }
+    int gethp(const int index) { return umanager[index]->gethp(); }
+    int getdefence(const int index) { return umanager[index]->getdefence(); }
+    int getUnumbering(const int index) { return umanager[index]->getUnumbering(); }
+    int getlevel(const int index) { return umanager[index]->getlevel(); }
+    float getEX(const int index) { return umanager[index]->getEX(); }
+    bool getlive(const int index) { return umanager[index]->getlive(); }
+    size_t getsize() { return umanager.size(); }
+    void printall(const int index) {
+        cout << "\nname : " << getname(index)
+            << "\nage : " << getage(index)
+            << "\ndamage : " << getdamage(index) << "   hp : " << gethp(index) << "   defence : " << getdefence(index)
+            << "\nlevel : " << getlevel(index) << "   EX : " << getEX(index) << "   Type : " << 1
+            << "\nnumbering : " << manager.getnumbering(index) << "   type numbering : " << getUnumbering(index) << "\n\n";
+    }
+
+    void setname(const int index, const string& newname) { umanager[index]->setname(newname); }
+    void setage(const int index, const int newage) { umanager[index]->setage(newage); }
+    void setdamage(const int index, const int newdamage) { umanager[index]->setdamage(newdamage); }
+    void sethp(const int index, const int newhp) { umanager[index]->sethp(newhp); }
+    void setdefence(const int index, const int newdefence) { umanager[index]->setdefence(newdefence); }
+    void setlevel(const int index, const int newlevel) { umanager[index]->setlevel(newlevel); }
+    void setEX(const int index, const float newEX) { umanager[index]->setEX(newEX); }
+    void setlive(const int index, const bool newlive) { umanager[index]->setlive(newlive); }
+    void setUnum(const int index, const int newUnum) { umanager[index]->setusernum(newUnum); }
+
+    void sortnum() {
+        sort(umanager.begin(), umanager.end(), [](const auto& a, const auto& b) {
+            return a->getnumbering() < b->getnumbering();
+            });
+    }
+    void sortname() {
+        sort(umanager.begin(), umanager.end(), [](const auto& a, const auto& b) {
+            return a->getname() < b->getname();
+            });
+    }
+    void sortage() {
+        sort(umanager.begin(), umanager.end(), [](const auto& a, const auto& b) {
+            return a->getage() < b->getage();
+            });
+    }
+    void sortdamage() {
+        sort(umanager.begin(), umanager.end(), [](const auto& a, const auto& b) {
+            return a->getdamage() < b->getdamage();
+            });
+    }
+    void sorthp() {
+        sort(umanager.begin(), umanager.end(), [](const auto& a, const auto& b) {
+            return a->gethp() < b->gethp();
+            });
+    }
+    void sortdefence() {
+        sort(umanager.begin(), umanager.end(), [](const auto& a, const auto& b) {
+            return a->getdefence() < b->getdefence();
+            });
+    }
+    void sortlevel() {
+        sort(umanager.begin(), umanager.end(), [](const auto& a, const auto& b) {
+            return a->getlevel() < b->getlevel();
+            });
+    }
+};
+
+class monstermanager {
+private:
+    livingmanager& manager;
+    vector<shared_ptr<monster>> mmanager;
+public:
+    monstermanager(livingmanager& m) :manager(m) {}
+
+    int RMnumbering() {
+        return mmanager.size() + 1;
+    }
+
+    void pushmonster(const string& name, const int age, const int damage, const int hp, const int defence) {
+        shared_ptr<monster> newmonster = make_shared<monster>(name, age, damage, hp, defence);
+        manager.push(newmonster);
+        mmanager.push_back(newmonster);
+    }
+
+    void deletemonster(const int index, const int mainindex) {
+        mmanager.erase(mmanager.begin() + index);
+        manager.deleteliving(mainindex);
+    }
+
+    string getname(const int index) { return mmanager[index]->getname(); }
+    int getage(const int index) { return mmanager[index]->getage(); }
+    int getdamage(const int index) { return mmanager[index]->getdamage(); }
+    int gethp(const int index) { return mmanager[index]->gethp(); }
+    int getdefence(const int index) { return mmanager[index]->getdefence(); }
+    int getMnumbering(const int index) { return mmanager[index]->getMnumbering(); }
+    int getlevel(const int index) { return mmanager[index]->getlevel(); }
+    float getEX(const int index) { return mmanager[index]->getEX(); }
+    bool getlive(const int index) { return mmanager[index]->getlive(); }
+    size_t getsize() { return mmanager.size(); }
+    void printall(const int index) {
+        cout << "\nname : " << getname(index)
+            << "\nage : " << getage(index)
+            << "\ndamage : " << getdamage(index) << "   hp : " << gethp(index) << "   defence : " << getdefence(index)
+            << "\nlevel : " << getlevel(index) << "   EX : " << getEX(index) << "   Type : " << 2
+            << "\nnumbering : " << manager.getnumbering(index) << "   type numbering : " << getMnumbering(index) << "\n\n";
+    }
+
+    void setname(const int index, const string& newname) { mmanager[index]->setname(newname); }
+    void setage(const int index, const int newage) { mmanager[index]->setage(newage); }
+    void setdamage(const int index, const int newdamage) { mmanager[index]->setdamage(newdamage); }
+    void sethp(const int index, const int newhp) { mmanager[index]->sethp(newhp); }
+    void setdefence(const int index, const int newdefence) { mmanager[index]->setdefence(newdefence); }
+    void setlevel(const int index, const int newlevel) { mmanager[index]->setlevel(newlevel); }
+    void setEX(const int index, const float newEX) { mmanager[index]->setEX(newEX); }
+    void setlive(const int index, const bool newlive) { mmanager[index]->setlive(newlive); }
+    void setUnum(const int index, const int newMnum) { mmanager[index]->setmonsternum(newMnum); }
+
+    void sortnum() {
+        sort(mmanager.begin(), mmanager.end(), [](const auto& a, const auto& b) {
+            return a->getnumbering() < b->getnumbering();
+            });
+    }
+    void sortname() {
+        sort(mmanager.begin(), mmanager.end(), [](const auto& a, const auto& b) {
+            return a->getname() < b->getname();
+            });
+    }
+    void sortage() {
+        sort(mmanager.begin(), mmanager.end(), [](const auto& a, const auto& b) {
+            return a->getage() < b->getage();
+            });
+    }
+    void sortdamage() {
+        sort(mmanager.begin(), mmanager.end(), [](const auto& a, const auto& b) {
+            return a->getdamage() < b->getdamage();
+            });
+    }
+    void sorthp() {
+        sort(mmanager.begin(), mmanager.end(), [](const auto& a, const auto& b) {
+            return a->gethp() < b->gethp();
+            });
+    }
+    void sortdefence() {
+        sort(mmanager.begin(), mmanager.end(), [](const auto& a, const auto& b) {
+            return a->getdefence() < b->getdefence();
+            });
+    }
+    void sortlevel() {
+        sort(mmanager.begin(), mmanager.end(), [](const auto& a, const auto& b) {
+            return a->getlevel() < b->getlevel();
+            });
+    }
+};
+
+class inputmanager {
+public:
+    string reinput(const string& errorments) {
+        string input;
+        cout << errorments << "\n" << "input >>>> ";
+        getline(cin, input);
+        return input;
+    }
+};
+
+class cinmanager {
+private:
+    inputmanager imanager;
+public:
+    int intcin(string stringnum) {
+        while (1) {
+            int returnnum = 0;
+            bool returntoken = true;
+            for (char ch : stringnum) {
+                if (ch < '0' || ch>'9') {
+                    returntoken = false;
+                    break;
+                }
+                returnnum = returnnum * 10 + (ch - '0');
+            }
+            if (returntoken == true) {
+                return returnnum;
+            }
+            stringnum = imanager.reinput("error type to input");
+
+        }
+    }
+};
+
+class push {
+private:
+    string name;
+    string input;
+    int age;
+    int damage;
+    int hp;
+    int defence;
+    int classnum;
+    cinmanager cmanager;
+    inputmanager imanager;
+    usermanager& umanager;
+    monstermanager& mmanager;
+public:
+    push(usermanager& u, monstermanager& m) :umanager(u), mmanager(m) {}
+    void pushliving() {
+        while (1) {
+            system("cls");
+            cout << "input living type\n1.User >> (1)\n2.monster >> (2)\n>>>> ";
+            getline(cin, input);
+            classnum = cmanager.intcin(input);
+            if (classnum != 1 && classnum != 2) {
+                continue;
+            }
+            else if (classnum == 1) { pushuser(); }
+            else if (classnum == 2) { pushmonster(); }
+            break;
+        }
+    }
+    void pushuser() {
+        cout << "input user name >> ";
+        getline(cin, name);
+        cout << "input user age >> ";
+        getline(cin, input);
+        age = cmanager.intcin(input);
+        umanager.pushuser(name, age);
+    }
+    void pushmonster() {
+        cout << "input monster name >> ";
+        getline(cin, name);
+        cout << "input monster age >> ";
+        getline(cin, input);
+        age = cmanager.intcin(input);
+        cout << "input monster damage >> ";
+        getline(cin, input);
+        damage = cmanager.intcin(input);
+        cout << "input monster hp >> ";
+        getline(cin, input);
+        hp = cmanager.intcin(input);
+        cout << "input monster defence >> ";
+        getline(cin, input);
+        defence = cmanager.intcin(input);
+
+        mmanager.pushmonster(name, age, damage, hp, defence);
+    }
+};
+
+class findliving {
+private:
+    string name;
+    string input;
+    int num, unum, mnum, index;
+    inputmanager imanager;
+    cinmanager cmanager;
+    usermanager& umanager;
+    monstermanager& mmanager;
+    livingmanager& manager;
+public:
+    findliving(usermanager& u, monstermanager& m, livingmanager& l) :umanager(u), mmanager(m), manager(l) {}
+
+    int Commandfindname(const string& name) {
+        for (int i = 0; i < manager.getsize(); i++) {
+            if (manager.getname(i) == name) {
+                return i;
+            }
+        }
+    }
+
+    int CommandfindUname(const string& name) {
+        for (int i = 0; i < umanager.getsize(); i++) {
+            if (umanager.getname(i) == name) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    int CommandfindMname(const string& name) {
+        for (int i = 0; i < mmanager.getsize(); i++) {
+            if (mmanager.getname(i) == name) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    int Commandfindnumbering(const int numbering) {
+        for (int i = 0; i < manager.getsize(); i++) {
+            if (manager.getnumbering(i) == numbering) {
+                return i;
+            }
+        }
+    }
+
+    int CommandfindUtypenum(const int typenum) {
+        for (int i = 0; i < manager.getsize(); i++) {
+            if (manager.gettypenum(i) == typenum && manager.gettype(i) == 1) {
+                return i;
+            }
+        }
+    }
+
+    int CommandfindMtypenum(const int typenum) {
+        for (int i = 0; i < manager.getsize(); i++) {
+            if (manager.gettypenum(i) == typenum && manager.gettype(i) == 2) {
+                return i;
+            }
+        }
+    }
+
+    int Commandfindmainindex(const int index, const int type) {
+        if (type == 1) {
+            for (int i = 0; i < manager.getsize(); i++) {
+                if (umanager.getname(index) == manager.getname(i)) {
+                    return i;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < manager.getsize(); i++) {
+                if (mmanager.getname(index) == manager.getname(i)) {
+                    return i;
+                }
+            }
+        }
+    }
+
+    int findname() {
+        cout << "input living name >>> ";
+        getline(cin, name);
+        while (1) {
+            for (int i = 0; i < manager.getsize(); i++) {
+                if (manager.getname(i) == name) {
+                    return i;
+                }
+            }
+            name = imanager.reinput("no name to find...\nbreak num >> (0)\nOr input name");
+            if (name == "0") {
+                return -1;
+            }
+        }
+    }
+
+    int findnumbering() {
+        cout << "input numbering living type\n1.All >>(1)\n2.User >>(2)\n3.Monster >>(3)\n>>>> ";
+        getline(cin, input);
+        int typenum = cmanager.intcin(input);
+        while (1) {
+            if (typenum < 1 && typenum>3) {
+                input = imanager.reinput("no command to find...\n1.break num >>(0)\nor command input");
+                int typenum = cmanager.intcin(input);
+                if (typenum == 0) {
+                    break;
+                }
+                else {
+                    continue;
+                }
+            }
+            else if (typenum == 1) {
+                index = findAllnum();
+                return index;
+            }
+            else if (typenum == 2) {
+                index = findUnum();
+                return index;
+            }
+            else if (typenum == 3) {
+                index = findMnum();
+                return index;
+            }
+        }
+    }
+
+    int findAllnum() {
+        while (1) {
+            getline(cin, input);
+            num = cmanager.intcin(input);
+            for (int i = 0; i < manager.getsize(); i++) {
+                if (manager.getnumbering(i) == num) {
+                    return i;
+                }
+            }
+            input = imanager.reinput("no numbering to find...\nbreak num >> (0)\nOr input numbering");
+            num = cmanager.intcin(input);
+            if (num == 0) {
+                return -1;
+            }
+        }
+    }
+
+    int findUnum() {
+        while (1) {
+            getline(cin, input);
+            num = cmanager.intcin(input);
+            for (int i = 0; i < umanager.getsize(); i++) {
+                if (umanager.getUnumbering(i) == num) {
+                    return i;
+                }
+            }
+            input = imanager.reinput("no user numbering to find...\nbreak num >> (0)\nOr input numbering");
+            num = cmanager.intcin(input);
+            if (num == 0) {
+                return -1;
+            }
+        }
+    }
+
+    int findMnum() {
+        while (1) {
+            getline(cin, input);
+            num = cmanager.intcin(input);
+            for (int i = 0; i < mmanager.getsize(); i++) {
+                if (mmanager.getMnumbering(i) == num) {
+                    return i;
+                }
+            }
+            input = imanager.reinput("no monster numbering to find...\nbreak num >> (0)\nOr input numbering");
+            num = cmanager.intcin(input);
+            if (num == 0) {
+                return -1;
+            }
+        }
+    }
+
+    int findLiving() {
+        cout << "input living part to find\n1.name >>(1)\n2.numbering >>(2)\n>>>> ";
+        getline(cin, input);
+        int num = cmanager.intcin(input);
+        while (1) {
+            if (num != 1 && num != 2) {
+                input = imanager.reinput("no cammand to find...\nbreak num >>(0)\nor command input");
+                num = cmanager.intcin(input);
+                if (num == 0) {
+                    return -1;
+                }
+                continue;
+            }
+            else if (num == 1) {
+                return findname();
+            }
+            else if (num == 2) {
+                return findnumbering();
+            }
+        }
+    }
+
+    int CommandfindLiving(const int type) {
+        cout << "input living part to find\n1.name >>(1)\n2.numbering >>(2)\n>>>> ";
+        getline(cin, input);
+        int num = cmanager.intcin(input);
+        while (1) {
+            if (num != 1 && num != 2) {
+                input = imanager.reinput("no cammand to find...\nbreak num >>(0)\nor command input");
+                num = cmanager.intcin(input);
+                if (num == 0) {
+                    return -1;
+                }
+                continue;
+            }
+            else if (num == 1) {
+                return findname();
+            }
+            else if (num == 2 && type == 1) {
+                return findUnum();
+            }
+            else if (num == 2 && type == 2) {
+                return findMnum();
+            }
+        }
+    }
+};
+
+class deleteLiving {
+private:
+    livingmanager& manager;
+    cinmanager cmanager;
+    inputmanager imanager;
+    usermanager& umanager;
+    monstermanager& mmanager;
+    findliving& fmanager;
+    string input;
+    int index;
+    int mainindex;
+    int allindex;
+    int num;
+    string name;
+public:
+    deleteLiving(livingmanager& l, usermanager& u, monstermanager& m, findliving& f) :manager(l), umanager(u), mmanager(m), fmanager(f) {}
+    void deleteliving() {
+        umanager.sortnum();
+        mmanager.sortnum();
+        manager.sortnum();
+        system("cls");
+        cout << "input delete living type\n1.user >> (1)\n2.monster >>(2)\n>>>> ";
+        getline(cin, input);
+        num = cmanager.intcin(input);
+        while (1) {
+            if (num != 1 && num != 2) {
+                input = imanager.reinput("no type to find...\n1.break num >>(0)\n2.input type num");
+                num = cmanager.intcin(input);
+                if (num == 0) {
+                    break;
+                }
+                continue;
+            }
+            else {
+                index = fmanager.CommandfindLiving(num);
+                break;
+            }
+        }
+        if (num == 1) {
+            name = umanager.getname(index);
+            while (1) {
+                cout << "delete" << name << "?\n1.YES >> (1)\n2.NO >> (2)\n>>>> ";
+                getline(cin, input);
+                num = cmanager.intcin(input);
+                if (num == 2) {
+                    cout << "no complete delete " << name << "...\n";
+                    system("pause");
+                    break;
+                }
+                allindex = fmanager.Commandfindname(name);
+                mainindex = fmanager.Commandfindmainindex(index, 1);
+                umanager.deleteuser(index, mainindex);
+                umanager.sortnum();
+                manager.sortnum();
+                cout << "complete " << name << "...\n";
+                system("pause");
+            }
+        }
+        else if (num == 2) {
+            name = mmanager.getname(index);
+            while (1) {
+                cout << "delete" << name << "?\n1.YES >> (1)\n2.NO >> (2)\n>>>> ";
+                getline(cin, input);
+                num = cmanager.intcin(input);
+                if (num == 2) {
+                    cout << "no complete delete " << name << "...\n";
+                    system("pause");
+                    break;
+                }
+                mainindex = fmanager.Commandfindmainindex(index, 2);
+                mmanager.deletemonster(index, mainindex);
+                mmanager.sortnum();
+                manager.sortnum();
+                cout << "complete " << name << "...\n";
+                system("pause");
+            }
+        }
+    }
+};
+
+class leveling {
+private:
+    int level;
+    int index;
+    float EX;
+    string input;
+    cinmanager cmanager;
+    inputmanager imanager;
+    findliving& fmanager;
+    livingmanager& manager;
+    usermanager& umanager;
+    monstermanager& mmanager;
+    bool levelup;
+    int EXUP;
+public:
+    leveling(livingmanager& l, usermanager& u, monstermanager& m, findliving& f)
+        : manager(l), umanager(u), mmanager(m), fmanager(f) {
+        levelup = false;
+        EXUP = 1;
+    }
+
+    void updateLevelState(int index) {
+        if (index >= 0 && index < umanager.getsize()) {
+            levelup = umanager.getlevel(index) * 1.5 < umanager.getEX(index);
+            EXUP = 1 - umanager.getlevel(index) / 100;
+        }
+    }
+
+    void userlevelup(const int index) {
+        updateLevelState(index);
+        while (!levelup) {
+            umanager.setlevel(index, umanager.getlevel(index) + 1);
+            Ustat(index);
+        }
+    }
+    void EXup(const string& name) {
+        index = fmanager.Commandfindname(name);
+        updateLevelState(index);
+        umanager.setEX(index, umanager.getEX(index) + EXUP);
+        userlevelup(index);
+    }
+    void Ustat(const int index) {
+        int damage, hp, defence;
+        damage = umanager.getlevel(index) * 1.5 + 5;
+        hp = umanager.getlevel(index) * 2 + 10;
+        defence = umanager.getlevel(index) * 0.7;
+        umanager.setdamage(index, damage);
+        umanager.sethp(index, hp);
+        umanager.setdefence(index, defence);
+    }
+
+};
+
+class fight {
+private:
+    int damage;
+    int hp;
+    int defence;
+    int aindex, dindex, index;
+    usermanager& umanager;
+    monstermanager& mmanager;
+    livingmanager& manager;
+    cinmanager cmanager;
+    inputmanager imanager;
+    findliving& fmanager;
+    bool userlive(int dindex) {
+        return manager.gettype(dindex) == 1;
+    }
+    bool iflive(int dindex) {
+        return manager.gethp(dindex) > 0;
+    }
+
+public:
+    fight(usermanager& u, monstermanager& m, livingmanager& l, findliving& f) :
+        umanager(u), mmanager(m), manager(l), fmanager(f), damage(), hp(), defence(), aindex(), dindex(), index() {
+    }
+    void die(const int dindex) {
+        if (!iflive(dindex)) {
+            if (userlive(dindex)) {
+                index = fmanager.CommandfindUname(manager.getname(dindex));
+                umanager.setlive(index, false);
+            }
+            else {
+                index = fmanager.CommandfindMname(manager.getname(dindex));
+                mmanager.setlive(index, false);
+            }
+        }
+    }
+    void attack(const string& atk, const string& df) {
+        aindex = fmanager.Commandfindname(atk);
+        dindex = fmanager.Commandfindname(df);
+        if (userlive(dindex)) {
+            index = fmanager.CommandfindUname(manager.getname(dindex));
+            if (umanager.getdefence(index) < manager.getdamage(aindex)) {
+                umanager.sethp(index, umanager.gethp(index) - (manager.getdamage(aindex) - umanager.getdefence(index)));
+                die(dindex);
+            }
+        }
+        else {
+            index = fmanager.CommandfindMname(manager.getname(dindex));
+            if (mmanager.getdefence(index) < manager.getdamage(aindex)) {
+                mmanager.sethp(index, mmanager.gethp(index) - (manager.getdamage(aindex) - mmanager.getdefence(index)));
+                die(dindex);
+            }
+
+        }
+    }
+};
+
+class secretmode {
+
+};
+
+class UI {
+private:
+    livingmanager manager;
+    usermanager umanager;
+    monstermanager mmanager;
+    findliving fmanager;
+    fight fightmanager;
+    cinmanager cmanager;
+    inputmanager imanager;
+    leveling levelmanager;
+    push& pmanager;
+    string input;
+    int cinnum;
+    int userindex;
+public:
+    UI(push& pushf) : manager(),
+        umanager(manager),
+        mmanager(manager),
+        fmanager(umanager, mmanager, manager),
+        levelmanager(manager, umanager, mmanager, fmanager),
+        fightmanager(umanager, mmanager, manager, fmanager),
+        pmanager(pushf) {
+    }
+    void start() {
+        cout << "hello!\nWellcom to my game world\n\n"
+            << "you can make your charactor...";
+        pmanager.pushuser();
+        pmanager.pushuser();
+        if (umanager.getsize() > 0) {
+            userindex = umanager.getsize() - 1;
+            cout << "hello " << umanager.getname(userindex) << "...\n";
+        }
+        else {
+            cout << "사용자가 생성되지 않았습니다.\n";
+        }
+
+        cout << "hello " << umanager.getname(userindex) << "...\n"
+            << "And you can make new monster...\ninput you will make monster number...\n>>>> ";
+        getline(cin, input);
+        cinnum = cmanager.intcin(input);
+        for (int i = 0; i < cinnum; i++) {
+            system("cls");
+            cout << i + 1 << "/" << cinnum << "\n\n";
+            pmanager.pushmonster();
+        }
+        system("cls");
+        cout << "you finish prefer the game\nwellcom to my game world!\n";
+        system("pause");
+    }
+
+    void showsort() {
+        cout << "input living type\n"
+            << "1.all.......(1)\n"
+            << "2.user......(2)\n"
+            << "3.monster...(3)\n"
+            << "input >>>>> ";
+        while (1) {
+            getline(cin, input);
+            cinnum = cmanager.intcin(input);
+            if (cinnum < 0 || cinnum>3) {
+                input = imanager.reinput("no command to find...\nbreak num...(0)");
+                if (input == "0") {
+                    break;
+                }
+            }
+            break;
+        }
+        if (cinnum == 1) {
+            system("cls");
+            cout << "all sort...\n"
+                << "input all living sort type"
+                << "1.name........(1)\n"
+                << "2.age.........(2)\n"
+                << "3.damage......(3)\n"
+                << "4.hp..........(4)\n"
+                << "5.defence.....(5)\n"
+                << "6.level.......(6)\n"
+                << "7.numbering...(7)\n"
+                << "input >>>>>>> ";
+            while (1) {
+                getline(cin, input);
+                cinnum = cmanager.intcin(input);
+                if (cinnum < 0 || cinnum>7) {
+                    input = imanager.reinput("no command to find...\nbreak num...(0)");
+                    if (input == "0") {
+                        break;
+                    }
+                }
+            }
+            if (cinnum == 1) {
+                manager.sortname();
+                for (int i = 0; i < manager.getsize(); i++) {
+                    manager.printall(i);
+                }
+            }
+            if (cinnum == 2) {
+                manager.sortage();
+                for (int i = 0; i < manager.getsize(); i++) {
+                    manager.printall(i);
+                }
+            }
+            if (cinnum == 3) {
+                manager.sortdamage();
+                for (int i = 0; i < manager.getsize(); i++) {
+                    manager.printall(i);
+                }
+            }
+            if (cinnum == 4) {
+                manager.sorthp();
+                for (int i = 0; i < manager.getsize(); i++) {
+                    manager.printall(i);
+                }
+            }
+            if (cinnum == 5) {
+                manager.sortdefence();
+                for (int i = 0; i < manager.getsize(); i++) {
+                    manager.printall(i);
+                }
+            }
+            if (cinnum == 6) {
+                manager.sortlevel();
+                for (int i = 0; i < manager.getsize(); i++) {
+                    manager.printall(i);
+                }
+            }
+            if (cinnum == 7) {
+                manager.sortnum();
+                for (int i = 0; i < manager.getsize(); i++) {
+                    manager.printall(i);
+                }
+            }
+        }
+        else if (cinnum == 2) {
+            system("cls");
+            cout << "user sort...\n"
+                << "input all living sort type"
+                << "1.name........(1)\n"
+                << "2.age.........(2)\n"
+                << "3.damage......(3)\n"
+                << "4.hp..........(4)\n"
+                << "5.defence.....(5)\n"
+                << "6.level.......(6)\n"
+                << "7.numbering...(7)\n"
+                << "input >>>>>>> ";
+            while (1) {
+                getline(cin, input);
+                cinnum = cmanager.intcin(input);
+                if (cinnum < 0 || cinnum>7) {
+                    input = imanager.reinput("no command to find...\nbreak num...(0)");
+                    if (input == "0") {
+                        break;
+                    }
+                }
+            }
+            if (cinnum == 1) {
+                umanager.sortname();
+                for (int i = 0; i < umanager.getsize(); i++) {
+                    umanager.printall(i);
+                }
+            }
+            if (cinnum == 2) {
+                umanager.sortage();
+                for (int i = 0; i < umanager.getsize(); i++) {
+                    umanager.printall(i);
+                }
+            }
+            if (cinnum == 3) {
+                umanager.sortdamage();
+                for (int i = 0; i < umanager.getsize(); i++) {
+                    umanager.printall(i);
+                }
+            }
+            if (cinnum == 4) {
+                umanager.sorthp();
+                for (int i = 0; i < umanager.getsize(); i++) {
+                    umanager.printall(i);
+                }
+            }
+            if (cinnum == 5) {
+                umanager.sortdefence();
+                for (int i = 0; i < umanager.getsize(); i++) {
+                    umanager.printall(i);
+                }
+            }
+            if (cinnum == 6) {
+                umanager.sortlevel();
+                for (int i = 0; i < umanager.getsize(); i++) {
+                    umanager.printall(i);
+                }
+            }
+            if (cinnum == 7) {
+                umanager.sortnum();
+                for (int i = 0; i < umanager.getsize(); i++) {
+                    umanager.printall(i);
+                }
+            }
+        }
+        else if (cinnum == 3) {
+            system("cls");
+            cout << "monster sort...\n"
+                << "input all living sort type"
+                << "1.name........(1)\n"
+                << "2.age.........(2)\n"
+                << "3.damage......(3)\n"
+                << "4.hp..........(4)\n"
+                << "5.defence.....(5)\n"
+                << "6.level.......(6)\n"
+                << "7.numbering...(7)\n"
+                << "input >>>>>>> ";
+            while (1) {
+                getline(cin, input);
+                cinnum = cmanager.intcin(input);
+                if (cinnum < 0 || cinnum>7) {
+                    input = imanager.reinput("no command to find...\nbreak num...(0)");
+                    if (input == "0") {
+                        break;
+                    }
+                }
+            }
+            if (cinnum == 1) {
+                mmanager.sortname();
+                for (int i = 0; i < mmanager.getsize(); i++) {
+                    mmanager.printall(i);
+                }
+            }
+            if (cinnum == 2) {
+                mmanager.sortage();
+                for (int i = 0; i < mmanager.getsize(); i++) {
+                    mmanager.printall(i);
+                }
+            }
+            if (cinnum == 3) {
+                mmanager.sortdamage();
+                for (int i = 0; i < mmanager.getsize(); i++) {
+                    mmanager.printall(i);
+                }
+            }
+            if (cinnum == 4) {
+                mmanager.sorthp();
+                for (int i = 0; i < mmanager.getsize(); i++) {
+                    mmanager.printall(i);
+                }
+            }
+            if (cinnum == 5) {
+                mmanager.sortdefence();
+                for (int i = 0; i < mmanager.getsize(); i++) {
+                    mmanager.printall(i);
+                }
+            }
+            if (cinnum == 6) {
+                mmanager.sortlevel();
+                for (int i = 0; i < mmanager.getsize(); i++) {
+                    mmanager.printall(i);
+                }
+            }
+            if (cinnum == 7) {
+                mmanager.sortnum();
+                for (int i = 0; i < mmanager.getsize(); i++) {
+                    mmanager.printall(i);
+                }
+            }
+        }
+    }
+
+    void choisefight() {
+
+    }
+
+    void gemeline() {
+        start();
+        while (1) {
+            system("cls");
+            cout << "you can choise work\n"
+                << "1.find entites...(1)\n"
+                << "2.push monster...(2)\n"
+                << "3.sort monster...(3)\n"
+                << "4.choise fight...(4)\n"
+                << "input >>>>>>>>>> ";
+            while (1) {
+                getline(cin, input);
+                cinnum = cmanager.intcin(input);
+                if (cinnum < 0 || cinnum>4) {
+                    input = imanager.reinput("no command to find...");
+                }
+                break;
+            }
+            if (cinnum == 1) {
+                fmanager.findLiving();
+            }
+            else if (cinnum == 2) {
+                pmanager.pushmonster();
+            }
+            else if (cinnum == 3) {
+                showsort();
+            }
+            else if (4) {
+
+            }
+
+        }
+    }
+
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    
+    livingmanager l;
+    usermanager u(l);
+    monstermanager m(l);
+
+    findliving f(u, m, l);
+    deleteLiving dl(l, u, m, f);
+    leveling level(l, u, m, f);
+    fight fi(u, m, l, f);
+    push p(u, m);
+
+    UI ui(p);
+    ui.gemeline();
+
+    return 0;
+}
